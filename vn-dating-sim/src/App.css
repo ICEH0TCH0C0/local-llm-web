@@ -1,0 +1,196 @@
+/* App.css */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #fff; /* PC 배경은 어둡게 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+}
+
+/* 📱 스마트폰 프레임 */
+.phone-frame {
+  width: 300px; /* 아이폰 표준 너비 */
+  height: 812px; /* 아이폰 표준 높이 */
+  max-height: 95vh; /* 화면 작을 때 대응 */
+  background-color: #fff;
+  border-radius: 40px;
+  border: 5px solid #1a1a1a; /* 베젤(테두리) */
+  position: relative;
+  overflow: hidden; /* 둥근 모서리 밖 내용 자르기 */
+  display: flex;
+  flex-direction: column;
+}
+
+/* 🔋 상단 상태바 (시계, 배터리) */
+.status-bar {
+  height: 40px;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  z-index: 10;
+}
+
+/* 👤 앱 헤더 (캐릭터 프로필) */
+.chat-header {
+  height: 60px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+  z-index: 10;
+}
+
+.back-btn {
+  font-size: 20px;
+  margin-right: 15px;
+  cursor: pointer;
+  color: #333;
+}
+
+.profile-pic {
+  width: 40px;
+  height: 40px;
+  background-color: #ffb6b9; /* 캐릭터 이미지 색상 */
+  border-radius: 50%;
+  margin-right: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+}
+
+.profile-info h2 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.profile-info span {
+  font-size: 12px;
+  color: #4cd137; /* 온라인 상태 표시 */
+}
+
+/* 💬 채팅 영역 */
+.message-list {
+  flex: 1;
+  background-color: #b2c7d9; /* 카카오톡 스타일 배경색 */
+  padding: 15px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* 스크롤바 숨기기 (깔끔하게) */
+.message-list::-webkit-scrollbar {
+  width: 4px;
+}
+.message-list::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.1);
+  border-radius: 4px;
+}
+
+.message-row {
+  display: flex;
+  align-items: flex-end;
+  max-width: 80%;
+}
+
+.my-msg {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.ai-msg {
+  align-self: flex-start;
+}
+
+.message-bubble {
+  padding: 10px 14px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+  position: relative;
+  word-wrap: break-word;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.my-msg .message-bubble {
+  background-color: #ffeb33; /* 카카오 노랑 */
+  color: #333;
+  border-top-right-radius: 4px;
+}
+
+.ai-msg .message-bubble {
+  background-color: #fff;
+  color: #333;
+  border-top-left-radius: 4px;
+}
+
+/* 캐릭터 아바타 (말풍선 옆) */
+.ai-avatar {
+  width: 32px;
+  height: 32px;
+  background-color: #ffb6b9;
+  border-radius: 12px;
+  margin-right: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* ⌨️ 입력창 영역 */
+.input-area {
+  background-color: #fff;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  border-top: 1px solid #eee;
+}
+
+.plus-btn {
+  font-size: 20px;
+  color: #ccc;
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+input {
+  flex: 1;
+  padding: 10px 12px;
+  background-color: #f1f2f3;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  outline: none;
+}
+
+.send-btn {
+  background-color: #ffeb33;
+  color: #333;
+  border: none;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  margin-left: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-weight: bold;
+}
+.send-btn:disabled {
+  background-color: #eee;
+  color: #aaa;
+}

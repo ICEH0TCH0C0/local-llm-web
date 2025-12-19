@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: dating-sim
+
+  datasource:
+    url: jdbc:h2:mem:testdb  # 메모리 DB 사용
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true  # http://localhost:8080/h2-console 로 DB 확인 가능
+      path: /h2-console
+
+  # [추가] JPA 설정 (이게 있어야 자바 Entity가 DB 테이블로 자동 생성됨)
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update  # 서버 켤 때마다 테이블 자동 생성/수정
+    show-sql: true      # SQL 실행되는 거 로그로 보기 (디버깅용)
+
+server:
+  port: 8080
+
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+# LangChain4j (LM Studio 설정)
+langchain4j:
+  open-ai:
+    chat-model:
+      base-url: http://localhost:1234/v1  # LM Studio 기본 주소
+      api-key: lm-studio                  # 아무거나 적어도 됨
+      model-name: local-model             # LM Studio에 로드된 모델을 씀
+      temperature: 0.7
+      timeout: 60s
+      log-requests: true                  # 로그 보면 연결 확인 쉬움
+      log-responses: true
