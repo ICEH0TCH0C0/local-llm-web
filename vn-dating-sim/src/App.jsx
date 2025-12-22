@@ -1,110 +1,51 @@
-// App.jsx
-import React, { useState, useRef, useEffect } from 'react';
-import './App.css';
+// src/App.jsx
+import React, { useEffect } from 'react';
+import * as S from './styles/smartphone.styled';
+import { usePhoneStore } from './store/phoneStore';
+import GalaxyPhone from './components/Phone'; 
 
 function App() {
-  const [input, setInput] = useState('');
-  const [messages, setMessages] = useState([
-    { sender: 'AI', text: '구매할 생각없으면, 나가줄래? 😠' }
-  ]);
-  const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef(null);
+  const { 
+    isPhoneVisible, notification, receiveNotification, openPhone 
+  } = usePhoneStore();
 
-  // 현재 시간 가져오기 (상단바용)
-  const currentTime = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
+  // 테스트: 3초 후 알림 도착
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const handleSend = async () => {
-    if (!input.trim()) return;
-
-    const userMsg = { sender: 'User', text: input };
-    setMessages(prev => [...prev, userMsg]);
-    setInput('');
-    setIsLoading(true);
-
-    try {
-      const response = await fetch("/api/game/chat", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input }),
-      });
-
-      if (!response.ok) throw new Error('Server Error');
-
-      const data = await response.json();
-      const aiMsg = { sender: 'AI', text: data.reply };
-      setMessages(prev => [...prev, aiMsg]);
-      
-    } catch (error) {
-      console.error(error);
-      setMessages(prev => [...prev, { sender: 'System', text: '지금은 대답하기 곤란해... (서버 연결 실패)' }]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    const timer = setTimeout(() => {
+      receiveNotification('루나', '선배, 뭐해요?');
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <div className="phone-frame">
-      
-      {/* 1. 상단 상태바 (Status Bar) */}
-      <div className="status-bar">
-        <span>{currentTime}</span>
-        <div style={{display: 'flex', gap: '5px'}}>
-          <span>📶</span>
-          <span>🔋</span>
+    <S.LayoutWrapper>
+      <S.GameContainer>
+        {/* 메인 게임 배경 */}
+        <div style={{ padding: '50px' }}>
+          <h1>메인 화면</h1>
+          <p>우측 하단 아이콘을 눌러 언제든 폰을 확인할 수 있습니다.</p>
+          <p>{notification ? "📩 메시지가 도착했습니다! (아이콘이 움직입니다)" : "알림 대기 중..."}</p>
         </div>
-      </div>
 
-      {/* 2. 앱 헤더 (App Header) */}
-      <header className="chat-header">
-        <span className="back-btn">❮</span>
-        <div className="profile-pic">👩‍🦰</div> {/* 이미지 URL 대신 이모지 임시 사용 */}
-        <div className="profile-info">
-          <h2>루나 상점 🌙</h2>
-          <span>● Online</span>
-        </div>
-      </header>
+        {/* 휴대폰 트리거 아이콘 (항상 표시, 폰 열리면 숨김) */}
+        {!isPhoneVisible && (
+          <S.PhoneTrigger 
+            onClick={openPhone} 
+            $hasNotification={!!notification} // 알림 있으면 true -> 애니메이션 ON
+          >
+            📱
+            {/* 알림 있을 때만 뱃지 표시 */}
+            {notification && <S.Badge>N</S.Badge>}
+          </S.PhoneTrigger>
+        )}
 
-      {/* 3. 메시지 리스트 */}
-      <div className="message-list">
-        {messages.map((msg, idx) => (
-          <div key={idx} className={`message-row ${msg.sender === 'User' ? 'my-msg' : 'ai-msg'}`}>
-            
-            {/* AI일 때만 프로필 사진 표시 */}
-            {msg.sender === 'AI' && <div className="ai-avatar">👩‍🦰</div>}
-            
-            <div className="message-bubble">
-              {msg.text}
-            </div>
-          </div>
-        ))}
-        {isLoading && <div className="loading-indicator">입력 중... 💬</div>}
-        <div ref={messagesEndRef} />
-      </div>
+        {/* 스마트폰 (슬라이드 애니메이션 래퍼) */}
+        <S.PhoneWrapper $isVisible={isPhoneVisible}>
+          <GalaxyPhone />
+        </S.PhoneWrapper>
 
-      {/* 4. 하단 입력창 */}
-      <div className="input-area">
-        <span className="plus-btn">+</span>
-        <input 
-          type="text" 
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-          placeholder="메시지를 입력하세요"
-          disabled={isLoading}
-        />
-        <button className="send-btn" onClick={handleSend} disabled={isLoading}>
-          ➤
-        </button>
-      </div>
-    </div>
+      </S.GameContainer>
+    </S.LayoutWrapper>
   );
 }
 
