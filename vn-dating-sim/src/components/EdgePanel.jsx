@@ -1,11 +1,13 @@
+// src/components/EdgePanel.jsx
 import React from 'react';
 import * as S from '../styles/smartphone.styled';
 import { usePhoneStore } from '../store/phoneStore';
+import { FaCommentDots, FaImages, FaMapMarkedAlt, FaCog } from 'react-icons/fa';
 
 const EDGE_APPS = [
-  { id: 'messenger', icon: '💬', color: '#ffeaa7' },
-  { id: 'map',       icon: '🗺️', color: '#55efc4' },
-  { id: 'gallery',   icon: '🖼️', color: '#ff7675' },
+  { id: 'messenger', icon: <FaCommentDots />, color: '#ffeaa7' },
+  { id: 'map',       icon: <FaMapMarkedAlt />, color: '#55efc4' },
+  { id: 'gallery',   icon: <FaImages />,      color: '#ff7675' },
 ];
 
 const EdgePanel = () => {
@@ -21,7 +23,10 @@ const EdgePanel = () => {
             {app.icon}
           </S.EdgeAppIcon>
         ))}
-        <div style={{ marginTop: 'auto', marginBottom: '20px', opacity: 0.5 }}>⚙️</div>
+        {/* 설정 아이콘 */}
+        <div style={{ marginTop: 'auto', marginBottom: '20px', opacity: 0.5, fontSize: '24px' }}>
+            <FaCog />
+        </div>
       </S.EdgePanelContainer>
     </>
   );

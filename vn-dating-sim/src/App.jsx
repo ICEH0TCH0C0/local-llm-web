@@ -2,7 +2,8 @@
 import React, { useEffect } from 'react';
 import * as S from './styles/smartphone.styled';
 import { usePhoneStore } from './store/phoneStore';
-import GalaxyPhone from './components/Phone'; 
+import Phone from './components/Phone'; 
+import { FaMobileAlt } from 'react-icons/fa';
 
 function App() {
   const { 
@@ -12,7 +13,7 @@ function App() {
   // 테스트: 3초 후 알림 도착
   useEffect(() => {
     const timer = setTimeout(() => {
-      receiveNotification('루나', '선배, 뭐해요?');
+      receiveNotification('강세라', '어디까지 했어?');
     }, 3000);
     return () => clearTimeout(timer);
   }, []);
@@ -31,19 +32,16 @@ function App() {
         {!isPhoneVisible && (
           <S.PhoneTrigger 
             onClick={openPhone} 
-            $hasNotification={!!notification} // 알림 있으면 true -> 애니메이션 ON
+            $hasNotification={!!notification}
           >
-            📱
-            {/* 알림 있을 때만 뱃지 표시 */}
+            <FaMobileAlt />
             {notification && <S.Badge>N</S.Badge>}
           </S.PhoneTrigger>
         )}
 
-        {/* 스마트폰 (슬라이드 애니메이션 래퍼) */}
         <S.PhoneWrapper $isVisible={isPhoneVisible}>
-          <GalaxyPhone />
+          <Phone />
         </S.PhoneWrapper>
-
       </S.GameContainer>
     </S.LayoutWrapper>
   );

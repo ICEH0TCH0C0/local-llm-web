@@ -2,26 +2,29 @@
 import React, { useState, useRef, useEffect } from 'react';
 import * as S from '../styles/smartphone.styled';
 import { usePhoneStore } from '../store/phoneStore';
+import { FaChevronLeft, FaEllipsisV, FaPlus, FaPaperPlane } from 'react-icons/fa';
+
+// ✅ ChatList에서 데이터를 가져옵니다 (이름 자동 동기화)
+import { CHAT_ROOM_DATA } from './ChatList';
 
 const ChatRoom = () => {
   const { goBack, selectedChatId } = usePhoneStore();
+  const messageContainerRef = useRef(null);
+  
+  // ✅ ID로 방 정보 찾기 (없으면 '알 수 없음')
+  const currentRoom = CHAT_ROOM_DATA.find(room => room.id === selectedChatId);
+  const roomName = currentRoom ? currentRoom.name : '알 수 없음';
   
   const [messages, setMessages] = useState([
-    { sender: 'AI', text: '안녕! 나는 루나야. 🌙 무엇을 도와줄까?' }
+    { sender: 'System', text: `${roomName} 님과의 대화가 시작되었습니다.` }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
-  // ✅ [변경 1] 스크롤 박스 자체를 잡기 위한 Ref
-  const messageContainerRef = useRef(null);
 
-  // ✅ [변경 2] 메시지가 추가될 때마다 scrollTop을 맨 아래로 설정
+  // 스크롤 자동 이동
   useEffect(() => {
     if (messageContainerRef.current) {
       const { scrollHeight, clientHeight } = messageContainerRef.current;
-      
-      // 부드러운 스크롤 대신 즉시 이동 (화면 튀는 현상 방지)
-      // 필요하다면 { behavior: 'smooth' } 옵션을 줄 수 있는 scrollTo() 사용 가능
       messageContainerRef.current.scrollTo({
         top: scrollHeight - clientHeight,
         behavior: 'smooth'
@@ -46,12 +49,13 @@ const ChatRoom = () => {
 
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
+      
       const aiMsg = { sender: 'AI', text: data.reply };
       setMessages(prev => [...prev, aiMsg]);
       
     } catch (error) {
       console.error("Error:", error);
-      setMessages(prev => [...prev, { sender: 'System', text: '서버와 연결할 수 없습니다.' }]);
+      setMessages(prev => [...prev, { sender: 'System', text: '서버 연결 실패 😢' }]);
     } finally {
       setIsLoading(false);
     }
@@ -61,21 +65,36 @@ const ChatRoom = () => {
     <>
       <S.ChatHeader>
         <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={goBack}>
-          <span style={{ fontSize: '20px', marginRight: '10px' }}>❮</span>
-          <S.ChatTitle>
-            {selectedChatId === 'luna' ? '루나 🌙' : '알 수 없음'}
-          </S.ChatTitle>
+          <FaChevronLeft style={{ marginRight: '10px' }} />
+          {/* ✅ 연동된 이름 표시 */}
+          <S.ChatTitle>{roomName}</S.ChatTitle>
         </div>
-        <span>⋮</span>
+        <FaEllipsisV style={{ color: '#bbb', cursor: 'pointer' }} />
       </S.ChatHeader>
 
-      {/* ✅ [변경 3] Ref를 컨테이너에 직접 연결 */}
       <S.MessageContainer ref={messageContainerRef}>
         {messages.map((msg, idx) => {
           const isMe = msg.sender === 'User';
+          const isSystem = msg.sender === 'System';
+
+          if (isSystem) {
+            return (
+              <div key={idx} style={{ textAlign: 'center', fontSize: '12px', color: '#888', margin: '10px 0' }}>
+                {msg.text}
+              </div>
+            );
+          }
+
           return (
             <S.MessageRow key={idx} $isMe={isMe}>
-              {!isMe && <S.AvatarSmall>👩‍🦰</S.AvatarSmall>}
+              {!isMe && (
+                <S.AvatarSmall style={{ background: currentRoom?.profileBg || '#ddd' }}>
+                  {/* 이름 첫 글자 표시 */}
+                  <span style={{color: '#fff', fontSize: '14px'}}>
+                     {currentRoom ? currentRoom.name.substring(0,1) : '?'}
+                   </span>
+                </S.AvatarSmall>
+              )}
               <S.Bubble $isMe={isMe}>
                 {msg.text}
               </S.Bubble>
@@ -85,25 +104,23 @@ const ChatRoom = () => {
         
         {isLoading && (
           <S.MessageRow $isMe={false}>
-            <S.AvatarSmall>👩‍🦰</S.AvatarSmall>
-            <S.Bubble $isMe={false}>입력 중... 💬</S.Bubble>
+            <S.AvatarSmall>⏳</S.AvatarSmall>
+            <S.Bubble $isMe={false}>...</S.Bubble>
           </S.MessageRow>
         )}
-        
-        {/* 기존 <div ref={messagesEndRef} /> 삭제됨 */}
       </S.MessageContainer>
 
       <S.InputBar>
-        <span style={{ fontSize: '20px', color: '#ccc', marginRight: '10px' }}>+</span>
+        <FaPlus style={{ color: '#ccc', marginRight: '10px', fontSize: '18px', cursor: 'pointer' }} />
         <S.ChatInput 
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-          placeholder="메시지를 입력하세요"
+          placeholder="메시지 입력"
           disabled={isLoading}
         />
         <S.SendButton onClick={handleSend} disabled={isLoading || !input.trim()}>
-          ➤
+          <FaPaperPlane size={14} color="#333" />
         </S.SendButton>
       </S.InputBar>
     </>
