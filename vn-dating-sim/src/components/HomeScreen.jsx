@@ -33,7 +33,7 @@ const HomeScreen = () => {
     if (dragStartY === null) return;
 
     const diff = dragStartY - clientY; // 양수면 위로 드래그, 음수면 아래로 드래그
-    const SWIPE_THRESHOLD = 50; // 50px 이상 움직여야 인식
+    const SWIPE_THRESHOLD = 30; // 50px 이상 움직여야 인식
 
     if (diff > SWIPE_THRESHOLD && !isDrawerOpen) {
       // 위로 쓸어올림 -> 열기
@@ -48,38 +48,33 @@ const HomeScreen = () => {
 
   return (
     <S.HomeContainer
-      // ✅ 마우스 이벤트 (PC)
       onMouseDown={(e) => handleDragStart(e.clientY)}
       onMouseUp={(e) => handleDragEnd(e.clientY)}
-      // ✅ 터치 이벤트 (모바일)
       onTouchStart={(e) => handleDragStart(e.touches[0].clientY)}
       onTouchEnd={(e) => handleDragEnd(e.changedTouches[0].clientY)}
     >
-      
-      {/* 1. 메인 홈 화면 (배경 + 시계) */}
       <S.HomeHeader>
         <S.HomeClock>12:45</S.HomeClock>
         <S.HomeDate>10월 24일 화요일</S.HomeDate>
       </S.HomeHeader>
 
-      {/* 3. 위로 스크롤 유도 (화살표) */}
-      {/* 클릭해도 열리게 유지하되, 드래그 힌트 역할 수행 */}
-      <S.SwipeArea>
+      {/* ✅ 클릭해도 열리도록 onClick 추가 */}
+      <S.SwipeArea onClick={() => setIsDrawerOpen(true)}>
         <FaChevronUp />
         <span>위로 스와이프</span>
       </S.SwipeArea>
 
-
-      {/* 4. 앱 보관함 (앱 드로어) */}
-      {/* 드로어 내부에서도 드래그 이벤트를 상속받아, 아래로 내리면 닫히게 동작함 */}
       <S.AppDrawer $isOpen={isDrawerOpen}>
-        <S.DrawerHandle onClick={() => setIsDrawerOpen(false)} />
+        {/* ✅ 드로어 핸들도 클릭하면 닫히도록 유지 */}
+        <S.DrawerHandle onClick={(e) => {
+          e.stopPropagation();
+          setIsDrawerOpen(false);
+        }} />
 
         <S.AppGrid>
           {APPS.map((app) => (
             <S.AppItem key={app.id} onClick={(e) => {
-              // 드래그 중 클릭 방지 (살짝 움직인 건 클릭으로 인정)
-              e.stopPropagation(); 
+              e.stopPropagation(); // 드로어 닫힘 방지
               launchApp(app.id);
             }}>
               <S.AppIcon $color={app.color}>
@@ -93,7 +88,6 @@ const HomeScreen = () => {
           ))}
         </S.AppGrid>
       </S.AppDrawer>
-
     </S.HomeContainer>
   );
 };

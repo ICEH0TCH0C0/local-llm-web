@@ -107,22 +107,33 @@ export const ContentWrapper = styled.div`
   flex: 1;
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   min-height: 0;
 `;
 
 export const StatusBar = styled.div`
+  /* ✅ 수정: 절대 위치로 설정하여 콘텐츠 위에 띄움 */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 5%;
-  padding: 0 8%;
+  
+  background-color: transparent;
+  z-index: 110; /* 콘텐츠보다 위에 위치 */
+  
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0 8%;
+  box-sizing: border-box; /* 패딩이 너비에 영향을 주지 않도록 설정 */
+  
   font-size: clamp(10px, 1.5vh, 14px);
   font-weight: 600;
   color: #333;
+  pointer-events: none; /* 클릭 이벤트가 하단 앱으로 전달되도록 설정 */
 `;
 
 export const AppGrid = styled.div`
@@ -184,13 +195,18 @@ export const AppName = styled.span`
 export const NavBar = styled.div`
   height: 7%;
   width: 100%;
-  background-color: #fff;
+  background-color: transparent;
   display: flex;
   justify-content: space-around;
   align-items: center;
-  border-top: 1px solid #eee;
+  border-top: none;
   flex-shrink: 0;
   z-index: 100;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  /* 네비바 자체는 이벤트를 통과시켜서 뒤의 홈 화면이 드래그를 감지하게 함 */
+  pointer-events: none;
 `;
 
 export const NavButton = styled.div`
@@ -199,10 +215,12 @@ export const NavButton = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: clamp(16px, 2.5vh, 24px);
+  font-size: clamp(14px, 2.5vh, 24px);
   color: #555;
   cursor: pointer;
-  &:active { background-color: #f0f0f0; }
+  /* 버튼들은 클릭이 되어야 하므로 다시 pointer-events를 살림 */
+  pointer-events: auto; 
+  &:active { background-color: rgba(0,0,0,0.05); border-radius: 10px; }
 `;
 
 // --------------------------------------------------------
@@ -306,8 +324,8 @@ export const Badge = styled.div`
 // --------------------------------------------------------
 
 export const ChatHeader = styled.div`
-  height: 60px;
-  padding: 0 15px;
+  height: auto;
+  padding: 25px 15px 10px 15px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -327,7 +345,7 @@ export const ChatListContainer = styled.div`
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden; /* 가로 스크롤 방지 */
-  padding: 10px 0;
+  padding: 10px 0 60px 0;
   background-color: #fff;
   width: 100%;
   max-width: 100%;
@@ -451,16 +469,18 @@ export const Bubble = styled.div`
 export const InputBar = styled.div`
   height: 50px;
   background-color: #fff;
+  width: 100%; /* 너비 명시 */
+  box-sizing: border-box; /* 패딩이 너비에 포함되도록 설정 */
   display: flex;
   align-items: center;
-  padding: 0 10px;
+  padding: 20px 10px 50px 10px;
   border-top: 1px solid #eee;
   flex-shrink: 0;
 `;
 
 export const ChatInput = styled.input`
   flex: 1;
-  height: 36px;
+  height: 28px;
   background-color: #f0f0f0;
   border: none;
   border-radius: 18px;
@@ -468,12 +488,14 @@ export const ChatInput = styled.input`
   font-size: 14px;
   outline: none;
   &:focus { background-color: #e5e5e5; }
+  min-width: 0;
 `;
 
 export const SendButton = styled.button`
   background: #ffeb33;
+  flex-shrink: 0;
   border: none;
-  width: 32px; height: 32px;
+  width: 28px; height: 28px;
   border-radius: 50%;
   margin-left: 8px;
   display: flex; justify-content: center; align-items: center;
@@ -564,20 +586,22 @@ export const SwipeArea = styled.div`
 // 4. 앱 보관함 (앱 드로어) - 평소엔 아래에 숨어있음
 export const AppDrawer = styled.div`
   position: absolute;
-  top: 0;
+  /* ✅ 하얀 배경은 화면 맨 위(0%)까지 올라오도록 설정 */
+  top: 0; 
   left: 0;
   width: 100%;
   height: 100%;
   
-  /* 유리 같은 반투명 배경 효과 */
+  /* 유리 느낌의 반투명 배경 */
   background-color: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(15px);
   
-  z-index: 20;
+  /* ✅ 상태바 뒤에 위치하도록 z-index 유지 (StatusBar는 110) */
+  z-index: 20; 
   
-  /* 🌟 핵심: isOpen 상태에 따라 위치 이동 (0% = 보임, 100% = 숨음) */
+  /* 애니메이션 설정 */
   transform: translateY(${(props) => (props.$isOpen ? '0%' : '100%')});
-  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); /* 부드러운 감속 */
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
   
   display: flex;
   flex-direction: column;
@@ -587,11 +611,15 @@ export const AppDrawer = styled.div`
 export const DrawerHandle = styled.div`
   width: 100%;
   height: 30px;
+  
+  /* ✅ 핵심: 회색 버튼이 상태바 아래(5%)에 위치하도록 마진 추가 */
+  margin-top: 5%; 
+  
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  flex-shrink: 0; /* 크기 줄어듦 방지 */
+  flex-shrink: 0;
   
   /* 작은 막대기 모양 */
   &::after {

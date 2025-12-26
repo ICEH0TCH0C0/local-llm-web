@@ -6,6 +6,7 @@ import { FaChevronLeft, FaEllipsisV, FaPlus, FaPaperPlane } from 'react-icons/fa
 
 // ✅ ChatList에서 데이터를 가져옵니다 (이름 자동 동기화)
 import { CHAT_ROOM_DATA } from './ChatList';
+import { MdKeyboardReturn } from 'react-icons/md';
 
 const ChatRoom = () => {
   const { goBack, selectedChatId } = usePhoneStore();
@@ -111,7 +112,15 @@ const ChatRoom = () => {
       </S.MessageContainer>
 
       <S.InputBar>
-        <FaPlus style={{ color: '#ccc', marginRight: '10px', fontSize: '18px', cursor: 'pointer' }} />
+        {/* + 버튼 (찌그러짐 방지 스타일 적용됨) */}
+        <FaPlus style={{ 
+          color: '#ccc', 
+          marginRight: '10px', 
+          fontSize: '18px', 
+          cursor: 'pointer',
+          flexShrink: 0 
+        }} />
+        
         <S.ChatInput 
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -119,8 +128,9 @@ const ChatRoom = () => {
           placeholder="메시지 입력"
           disabled={isLoading}
         />
+        
         <S.SendButton onClick={handleSend} disabled={isLoading || !input.trim()}>
-          <FaPaperPlane size={14} color="#333" />
+          <MdKeyboardReturn size={20} color="#333" />
         </S.SendButton>
       </S.InputBar>
     </>
