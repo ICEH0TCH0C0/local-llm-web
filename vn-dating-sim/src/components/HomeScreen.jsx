@@ -15,7 +15,7 @@ export const APPS = [
 ];
 
 const HomeScreen = () => {
-  const { launchApp } = usePhoneStore();
+  const { launchApp, currentTime } = usePhoneStore();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   
   // 드래그 시작 위치 저장
@@ -46,6 +46,20 @@ const HomeScreen = () => {
     setDragStartY(null); // 초기화
   };
 
+  //시간 포멧
+  const timeStr = currentTime.toLocaleTimeString('ko-KR', { 
+    hour: '2-digit', 
+    minute: '2-digit', 
+    hour12: false 
+  });
+
+  //날짜 포멧
+  const dateStr = currentTime.toLocaleDateString('ko-KR', { 
+    month: 'long', 
+    day: 'numeric', 
+    weekday: 'long' 
+  });
+
   return (
     <S.HomeContainer
       onMouseDown={(e) => handleDragStart(e.clientY)}
@@ -54,8 +68,8 @@ const HomeScreen = () => {
       onTouchEnd={(e) => handleDragEnd(e.changedTouches[0].clientY)}
     >
       <S.HomeHeader>
-        <S.HomeClock>12:45</S.HomeClock>
-        <S.HomeDate>10월 24일 화요일</S.HomeDate>
+        <S.HomeClock>{timeStr}</S.HomeClock>
+        <S.HomeDate>{dateStr}</S.HomeDate>
       </S.HomeHeader>
 
       {/* ✅ 클릭해도 열리도록 onClick 추가 */}

@@ -13,7 +13,22 @@ import { FaSignal, FaBatteryThreeQuarters, FaWifi, FaChevronLeft, FaBars } from 
 import { BiSquareRounded } from 'react-icons/bi';
 
 const GalaxyPhone = () => {
-  const { currentScreen, isPowerOn, togglePower, goBack, goToHome } = usePhoneStore();
+  const { currentScreen, isPowerOn, togglePower, goBack, goToHome, currentTime, updateTime } = usePhoneStore();
+
+  // 시간 업데이트
+  React.useEffect(() => {
+    const timer = setInterval(() => updateTime(), 1000);
+    return () => clearInterval(timer);
+  }, [updateTime]);
+
+  // ✅ 시간 포맷팅 함수 (16:07 형식)
+  const formatTime = (date) => {
+    return date.toLocaleTimeString('ko-KR', { 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      hour12: false 
+    });
+  };
 
   const renderContent = () => {
     if (!isPowerOn) return <PhoneOff />;
@@ -35,7 +50,8 @@ const GalaxyPhone = () => {
       <S.ScreenContent>
         {isPowerOn && (
           <S.StatusBar>
-            <span>12:45</span>
+            {/* ✅ 하드코딩된 12:45 대신 현재 시간 표시 */}
+            <span>{formatTime(currentTime)}</span>
             <div style={{display:'flex', gap:'6px', alignItems: 'center'}}>
               <FaWifi />
               <FaSignal />

@@ -578,7 +578,10 @@ export const SwipeArea = styled.div`
   
   span {
     margin-bottom: 5px;
-    font-size: 20px;
+    /* ✅ 수정: 글씨 크기를 10px로 줄이고 가독성을 위해 자간 조정 */
+    font-size: 10px; 
+    letter-spacing: -0.2px;
+    opacity: 0.8;
     animation: ${bounceUp} 2s infinite;
   }
 `;

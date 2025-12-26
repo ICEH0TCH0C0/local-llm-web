@@ -17,6 +17,10 @@ export const usePhoneStore = create((set, get) => ({
   isPhoneVisible: false,
   isEdgePanelOpen: false,
   notification: null,
+  currentTime: new Date(),
+
+  // 시간 업데이트 액션 추가
+  updateTime: () => set({ currentTime: new Date() }),
 
   // 액션
   togglePower: () => set((state) => ({
