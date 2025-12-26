@@ -1,14 +1,14 @@
 // src/components/Phone.jsx
 import React from 'react';
-import * as S from '../styles/smartphone.styled';
-import { usePhoneStore, SCREEN } from '../store/phoneStore';
+import * as S from '../../styles/smartphone.styled'; 
+import { usePhoneStore, SCREEN } from '../../store/phoneStore';
 
 // 컴포넌트 & 아이콘
-import PhoneOff from './PhoneOff';
-import HomeScreen from './HomeScreen';
-import EdgePanel from './EdgePanel';
-import ChatList from './ChatList';
-import ChatRoom from './ChatRoom';
+import PhoneOff from './screens/PhoneOff';
+import HomeScreen from './screens/HomeScreen';
+import EdgePanel from '../smartphone/components/EdgePanel';
+import ChatList from './apps/messenger/ChatList';
+import ChatRoom from './apps/messenger/ChatRoom';
 import { FaSignal, FaBatteryThreeQuarters, FaWifi, FaChevronLeft, FaBars } from 'react-icons/fa';
 import { BiSquareRounded } from 'react-icons/bi';
 

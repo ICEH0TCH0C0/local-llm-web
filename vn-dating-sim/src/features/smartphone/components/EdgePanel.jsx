@@ -1,14 +1,12 @@
 // src/components/EdgePanel.jsx
 import React from 'react';
-import * as S from '../styles/smartphone.styled';
-import { usePhoneStore } from '../store/phoneStore';
-import { FaCommentDots, FaImages, FaMapMarkedAlt, FaCog } from 'react-icons/fa';
+import * as S from '../../../styles/smartphone.styled';
+import { usePhoneStore } from '../../../store/phoneStore';
+import { FaCog } from 'react-icons/fa';
+import { APPS } from '../data/apps';
 
-const EDGE_APPS = [
-  { id: 'messenger', icon: <FaCommentDots />, color: '#ffeaa7' },
-  { id: 'map',       icon: <FaMapMarkedAlt />, color: '#55efc4' },
-  { id: 'gallery',   icon: <FaImages />,      color: '#ff7675' },
-];
+const FAVORITE_IDS = ['messenger', 'map', 'gallery'];
+const EDGE_APPS = APPS.filter(app => FAVORITE_IDS.includes(app.id));
 
 const EdgePanel = () => {
   const { isEdgePanelOpen, toggleEdgePanel, closeEdgePanel, launchApp } = usePhoneStore();

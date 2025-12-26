@@ -22,6 +22,24 @@ export const usePhoneStore = create((set, get) => ({
   // 시간 업데이트 액션 추가
   updateTime: () => set({ currentTime: new Date() }),
 
+  // 메시지 추가
+  addMessage: (chatId, message) => set((state) => ({
+    chats: state.chats.map(chat => 
+      chat.id === chatId 
+        ? { 
+            ...chat, 
+            // 새로운 메시지를 배열 끝에 추가
+            messages: [...chat.messages, { 
+              ...message, 
+              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
+            }],
+            // 방 안에 있을 때는 안 읽음 메시지 0으로 처리
+            unread: state.currentScreen === SCREEN.CHAT_ROOM && state.selectedChatId === chatId ? 0 : chat.unread
+          }
+        : chat
+    )
+  })),
+
   // 액션
   togglePower: () => set((state) => ({
     isPowerOn: !state.isPowerOn,

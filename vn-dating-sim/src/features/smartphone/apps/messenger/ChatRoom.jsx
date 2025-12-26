@@ -1,11 +1,11 @@
 // src/components/ChatRoom.jsx
 import React, { useState, useRef, useEffect } from 'react';
-import * as S from '../styles/smartphone.styled';
-import { usePhoneStore } from '../store/phoneStore';
+import * as S from '../../../../styles/smartphone.styled';
+import { usePhoneStore } from '../../../../store/phoneStore';
 import { FaChevronLeft, FaEllipsisV, FaPlus, FaPaperPlane } from 'react-icons/fa';
 
 // ✅ ChatList에서 데이터를 가져옵니다 (이름 자동 동기화)
-import { CHAT_ROOM_DATA } from './ChatList';
+import { CHAT_ROOM_DATA } from './data';
 import { MdKeyboardReturn } from 'react-icons/md';
 
 const ChatRoom = () => {
@@ -130,6 +130,7 @@ const ChatRoom = () => {
         />
         
         <S.SendButton onClick={handleSend} disabled={isLoading || !input.trim()}>
+
           <MdKeyboardReturn size={20} color="#333" />
         </S.SendButton>
       </S.InputBar>

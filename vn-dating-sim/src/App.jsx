@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import * as S from './styles/smartphone.styled';
 import { usePhoneStore } from './store/phoneStore';
-import Phone from './components/Phone'; 
+import Phone from './features/smartphone/Phone'; 
 import { FaMobileAlt } from 'react-icons/fa';
 
 function App() {
