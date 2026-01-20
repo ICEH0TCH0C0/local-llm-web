@@ -9,16 +9,14 @@ import { CHAT_ROOM_DATA } from './data';
 import { MdKeyboardReturn } from 'react-icons/md';
 
 const ChatRoom = () => {
-  const { goBack, selectedChatId } = usePhoneStore();
+  const { goBack, selectedChatId, chats, addMessage } = usePhoneStore();
   const messageContainerRef = useRef(null);
-  
-  // ✅ ID로 방 정보 찾기 (없으면 '알 수 없음')
-  const currentRoom = CHAT_ROOM_DATA.find(room => room.id === selectedChatId);
+
+  // ✅ ID로 방 정보 찾기
+  const currentRoom = chats.find(room => room.id === selectedChatId);
   const roomName = currentRoom ? currentRoom.name : '알 수 없음';
-  
-  const [messages, setMessages] = useState([
-    { sender: 'System', text: `${roomName} 님과의 대화가 시작되었습니다.` }
-  ]);
+  const messages = React.useMemo(() => (currentRoom ? currentRoom.messages : []), [currentRoom]);
+
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -37,7 +35,7 @@ const ChatRoom = () => {
     if (!input.trim()) return;
 
     const userMsg = { sender: 'User', text: input };
-    setMessages(prev => [...prev, userMsg]);
+    addMessage(selectedChatId, userMsg);
     setInput('');
     setIsLoading(true);
 
@@ -50,13 +48,13 @@ const ChatRoom = () => {
 
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
-      
+
       const aiMsg = { sender: 'AI', text: data.reply };
-      setMessages(prev => [...prev, aiMsg]);
-      
+      addMessage(selectedChatId, aiMsg);
+
     } catch (error) {
       console.error("Error:", error);
-      setMessages(prev => [...prev, { sender: 'System', text: '서버 연결 실패 😢' }]);
+      addMessage(selectedChatId, { sender: 'System', text: '서버 연결 실패 😢' });
     } finally {
       setIsLoading(false);
     }
@@ -67,7 +65,6 @@ const ChatRoom = () => {
       <S.ChatHeader>
         <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={goBack}>
           <FaChevronLeft style={{ marginRight: '10px' }} />
-          {/* ✅ 연동된 이름 표시 */}
           <S.ChatTitle>{roomName}</S.ChatTitle>
         </div>
         <FaEllipsisV style={{ color: '#bbb', cursor: 'pointer' }} />
@@ -77,6 +74,14 @@ const ChatRoom = () => {
         {messages.map((msg, idx) => {
           const isMe = msg.sender === 'User';
           const isSystem = msg.sender === 'System';
+
+          // 단체방용 프로필 정보 (메시지 객체에 이름/색상이 있으면 사용)
+          const senderName = msg.name || (currentRoom.type === 'individual' ? currentRoom.name : '익명');
+          const senderColor = msg.color || (currentRoom.type === 'individual' ? currentRoom.profileBg : '#ddd');
+
+          // 프로필 아이콘 찾기 (S.AvatarSmall 내부에 표시할 아이콘)
+          const senderProfile = CHAT_ROOM_DATA.find(c => c.id === msg.sender);
+          const profileIcon = senderProfile ? senderProfile.profileIcon : null;
 
           if (isSystem) {
             return (
@@ -89,20 +94,33 @@ const ChatRoom = () => {
           return (
             <S.MessageRow key={idx} $isMe={isMe}>
               {!isMe && (
-                <S.AvatarSmall style={{ background: currentRoom?.profileBg || '#ddd' }}>
-                  {/* 이름 첫 글자 표시 */}
-                  <span style={{color: '#fff', fontSize: '14px'}}>
-                     {currentRoom ? currentRoom.name.substring(0,1) : '?'}
-                   </span>
-                </S.AvatarSmall>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+                    <S.AvatarSmall style={{ background: senderColor, marginTop: '0px', marginRight: '8px', width: '30px', height: '20px' }}>
+                      {profileIcon || (
+                        <span style={{ color: '#fff', fontSize: '12px' }}>
+                          {senderName.substring(0, 1)}
+                        </span>
+                      )}
+                    </S.AvatarSmall>
+                    <span style={{ fontSize: '13px', color: '#666', fontWeight: 'bold' }}>
+                      {senderName}
+                    </span>
+                  </div>
+                  <S.Bubble $isMe={isMe}>
+                    {msg.text}
+                  </S.Bubble>
+                </div>
               )}
-              <S.Bubble $isMe={isMe}>
-                {msg.text}
-              </S.Bubble>
+              {isMe && (
+                <S.Bubble $isMe={isMe}>
+                  {msg.text}
+                </S.Bubble>
+              )}
             </S.MessageRow>
           );
         })}
-        
+
         {isLoading && (
           <S.MessageRow $isMe={false}>
             <S.AvatarSmall>⏳</S.AvatarSmall>
@@ -112,25 +130,15 @@ const ChatRoom = () => {
       </S.MessageContainer>
 
       <S.InputBar>
-        {/* + 버튼 (찌그러짐 방지 스타일 적용됨) */}
-        <FaPlus style={{ 
-          color: '#ccc', 
-          marginRight: '10px', 
-          fontSize: '18px', 
-          cursor: 'pointer',
-          flexShrink: 0 
-        }} />
-        
-        <S.ChatInput 
+        <FaPlus style={{ color: '#ccc', marginRight: '10px', fontSize: '18px', cursor: 'pointer', flexShrink: 0 }} />
+        <S.ChatInput
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && handleSend()}
           placeholder="메시지 입력"
           disabled={isLoading}
         />
-        
         <S.SendButton onClick={handleSend} disabled={isLoading || !input.trim()}>
-
           <MdKeyboardReturn size={20} color="#333" />
         </S.SendButton>
       </S.InputBar>

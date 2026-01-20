@@ -1,5 +1,5 @@
-// src/store/phoneStore.js
 import { create } from 'zustand';
+import { CHAT_ROOM_DATA } from '../features/smartphone/apps/messenger/data';
 
 export const SCREEN = {
   OFF: 'OFF',
@@ -18,24 +18,25 @@ export const usePhoneStore = create((set, get) => ({
   isEdgePanelOpen: false,
   notification: null,
   currentTime: new Date(),
+  chats: CHAT_ROOM_DATA, // 초기 데이터 설정
 
   // 시간 업데이트 액션 추가
   updateTime: () => set({ currentTime: new Date() }),
 
   // 메시지 추가
   addMessage: (chatId, message) => set((state) => ({
-    chats: state.chats.map(chat => 
-      chat.id === chatId 
-        ? { 
-            ...chat, 
-            // 새로운 메시지를 배열 끝에 추가
-            messages: [...chat.messages, { 
-              ...message, 
-              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
-            }],
-            // 방 안에 있을 때는 안 읽음 메시지 0으로 처리
-            unread: state.currentScreen === SCREEN.CHAT_ROOM && state.selectedChatId === chatId ? 0 : chat.unread
-          }
+    chats: state.chats.map(chat =>
+      chat.id === chatId
+        ? {
+          ...chat,
+          messages: [...chat.messages, {
+            ...message,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
+          }],
+          lastMessage: message.text,
+          time: '방금',
+          unread: state.currentScreen === SCREEN.CHAT_ROOM && state.selectedChatId === chatId ? 0 : chat.unread
+        }
         : chat
     )
   })),
@@ -45,12 +46,12 @@ export const usePhoneStore = create((set, get) => ({
     isPowerOn: !state.isPowerOn,
     currentScreen: !state.isPowerOn ? SCREEN.HOME : SCREEN.OFF
   })),
-  
+
   setPhoneVisible: (isVisible) => set({ isPhoneVisible: isVisible }),
-  
-  openPhone: () => set({ 
-    isPhoneVisible: true, 
-    notification: null 
+
+  openPhone: () => set({
+    isPhoneVisible: true,
+    notification: null
   }),
 
   // ✅ [수정] 앱 실행 로직 분기 처리
@@ -60,23 +61,25 @@ export const usePhoneStore = create((set, get) => ({
 
     if (appName === 'messenger') {
       // 메신저 앱 -> 채팅 목록 화면으로
-      set({ 
-        currentScreen: SCREEN.CHAT_LIST, 
-        activeApp: appName 
+      set({
+        currentScreen: SCREEN.CHAT_LIST,
+        activeApp: appName
       });
     } else {
       // 그 외 앱 -> 일단 홈 화면 유지 (추후 구현)
       console.log(`${appName} 앱은 아직 구현되지 않았습니다.`);
-      // 필요하다면 여기서 알림을 띄우거나 다른 화면으로 이동 가능
     }
   },
 
-  // ✅ [추가] 채팅방 입장하기
+  // ✅ [수정] 채팅방 입장하기 (읽음 처리 추가)
   enterChatRoom: (chatId) => {
-    set({
+    set((state) => ({
       currentScreen: SCREEN.CHAT_ROOM,
-      selectedChatId: chatId
-    });
+      selectedChatId: chatId,
+      chats: state.chats.map(chat =>
+        chat.id === chatId ? { ...chat, unread: 0 } : chat
+      )
+    }));
   },
 
   goToHome: () => {
@@ -108,6 +111,6 @@ export const usePhoneStore = create((set, get) => ({
 
   toggleEdgePanel: () => set((state) => ({ isEdgePanelOpen: !state.isEdgePanelOpen })),
   closeEdgePanel: () => set({ isEdgePanelOpen: false }),
-  
+
   receiveNotification: (sender, message) => set({ notification: { sender, message } }),
 }));

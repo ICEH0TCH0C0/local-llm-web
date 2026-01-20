@@ -2,11 +2,11 @@
 import React from 'react';
 import * as S from '../../../../styles/smartphone.styled';
 import { usePhoneStore } from '../../../../store/phoneStore';
-import { FaSearch} from 'react-icons/fa';
+import { FaSearch } from 'react-icons/fa';
 import { CHAT_ROOM_DATA } from './data.jsx';
 
 const ChatList = () => {
-  const { enterChatRoom } = usePhoneStore();
+  const { enterChatRoom, chats } = usePhoneStore();
 
   return (
     <>
@@ -16,16 +16,16 @@ const ChatList = () => {
       </S.ChatHeader>
 
       <S.ChatListContainer>
-        {CHAT_ROOM_DATA.map((room) => (
+        {chats.map((room) => (
           <S.ChatItem key={room.id} onClick={() => enterChatRoom(room.id)}>
             <S.ProfileImg $bg={room.profileBg}>
               {room.profileIcon}
             </S.ProfileImg>
-            
+
             <S.ChatInfo>
               <S.ChatName>
                 {room.name}
-                {room.type === 'group' && <span style={{color: '#999', fontSize: '12px', marginLeft: '5px'}}>5</span>}
+                {room.type === 'group' && <span style={{ color: '#999', fontSize: '12px', marginLeft: '5px' }}>5</span>}
               </S.ChatName>
               <S.LastMessage>{room.lastMessage}</S.LastMessage>
             </S.ChatInfo>
